@@ -15,9 +15,9 @@ if(onPi):
 def takePicture(id):
     """ Takes a picture with the webcam and returns the directory in ./tmp """
     path = shared.getPicturePath(id)
+    camera = PiCamera()
     if(onPi):
         try:
-            camera = PiCamera()
             camera.start_preview()
             sleep(5)
             camera.capture(path)
