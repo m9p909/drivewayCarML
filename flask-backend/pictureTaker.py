@@ -16,13 +16,17 @@ def takePicture(id):
     """ Takes a picture with the webcam and returns the directory in ./tmp """
     path = shared.getPicturePath(id)
     if(onPi):
-        
-        camera = PiCamera()
-        camera.start_preview()
-        sleep(5)
-        camera.capture(path)
-        camera.stop_preview()
-        return path
+        try:
+            camera = PiCamera()
+            camera.start_preview()
+            sleep(5)
+            camera.capture(path)
+        except:
+            path = "ERROR NO PATH"
+        finally:
+            camera.stop_preview()
+            return path
+
     # for debugging
     else:
         path = './pictures/'+str(id)+'.jpg'
