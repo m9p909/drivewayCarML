@@ -26,6 +26,7 @@ def takePicture(id):
             path = "ERROR NO PATH"
         finally:
             camera.stop_preview()
+            camera.close()
             return path
 
     # for debugging
