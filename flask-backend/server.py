@@ -1,11 +1,12 @@
 from flask import Flask
 from flask import request
 from flask import abort
+from flask import send_file
 import base64
 import sqlite3
 import json
 import pictureTaker
-from database import setupDatabase
+import shared
 
 
 app = Flask(__name__)
@@ -23,7 +24,7 @@ def dataPost(image, clean_score=-1):
     
     This method is currently INVALID, it will not work properly'''
     return None
-    con = setupDatabase()
+    con = shared.setupDatabase()
     cur = con.cursor()
     cur.execute("insert into images(image) values (?)",
                 ([sqlite3.Binary(image)]))
@@ -34,19 +35,21 @@ def dataPost(image, clean_score=-1):
                 "update images set clean_score=? where id=(select max(id) from images)", (clean_score,))
 
     con.commit()
+    con.close()
     return 'success'
 
 
 def dataGet(stuff):
     ''' gets a list of all the images in the db '''
-    con = setupDatabase()
+    con = shared.setupDatabase()
     cur = con.cursor()
     cur.execute('select * from images')
+    con.close()
     return json.dumps(cur.fetchall())
 
 
 def dataPut(stuff):
-    con = setupDatabase()
+    con = shared.setupDatabase()
     cur = con.cursor()
     if 'id' in stuff:
         if 'clean_score' in stuff:
@@ -56,14 +59,16 @@ def dataPut(stuff):
             else:
                 abort(400)
     con.commit()
+    con.close()
     return "success"
 
 
 def dataDelete(id):
-    con = setupDatabase()
+    con = shared.setupDatabase()
     cur = con.cursor()
     cur.execute('delete from images where id=?', id)
     con.commit()
+    con.close()
 
 
 @app.route('/data', methods=['POST', 'GET', 'PUT', 'DELETE'])
@@ -84,6 +89,11 @@ def data():
         return dataGet(request)
     elif request.method == 'DELETE':
         return dataDelete(request)
+
+@app.route('/images', methods=['GET'])
+def images():
+    num = int(request.args.get('id'))
+    return send_file(shared.getPicturePath(num))
 
 
 @app.route('/')

@@ -5,18 +5,18 @@ from datetime import datetime
 import os
 import shutil
 import traceback
-from database import setupDatabase
+import shared
 
-onPi = False
-if(os.uname()[4][:3] == 'arm'):
+onPi = shared.onPi
+if(onPi):
     from picamera import PiCamera
-    onPi = True
 
 
 def takePicture(id):
     """ Takes a picture with the webcam and returns the directory in ./tmp """
+    path = shared.getPicturePath(id)
     if(onPi):
-        path = '/home/pi/pictures/'+str(id)+'.jpg'
+        
         camera = PiCamera()
         camera.start_preview()
         sleep(5)
@@ -31,7 +31,7 @@ def takePicture(id):
 
 
 def getNextId():
-    con = setupDatabase()
+    con = shared.setupDatabase()
     cur = con.cursor()
     cur.execute("select MAX(id) as id from images")
     res = cur.fetchone()
@@ -43,7 +43,7 @@ def getNextId():
 
 
 def insertIntoDB(path):
-    con = setupDatabase()
+    con = shared.setupDatabase()
     cur = con.cursor()
     cur.execute('insert into images(image) values (?)', [path])
     con.commit()
