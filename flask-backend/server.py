@@ -35,7 +35,6 @@ def dataPost(image, clean_score=-1):
                 "update images set clean_score=? where id=(select max(id) from images)", (clean_score,))
 
     con.commit()
-    con.close()
     return 'success'
 
 
@@ -44,7 +43,6 @@ def dataGet(stuff):
     con = shared.setupDatabase()
     cur = con.cursor()
     cur.execute('select * from images')
-    con.close()
     return json.dumps(cur.fetchall())
 
 
@@ -59,7 +57,7 @@ def dataPut(stuff):
             else:
                 abort(400)
     con.commit()
-    con.close()
+
     return "success"
 
 
@@ -68,7 +66,6 @@ def dataDelete(id):
     cur = con.cursor()
     cur.execute('delete from images where id=?', id)
     con.commit()
-    con.close()
 
 
 @app.route('/data', methods=['POST', 'GET', 'PUT', 'DELETE'])
@@ -95,7 +92,10 @@ def images():
     res = request.args.get('id')
     if res != None:
         num = int(request.args.get('id'))
-        return send_file(shared.getPicturePath(num))
+        try:
+            return send_file(shared.getPicturePath(num))
+        except:
+            return 'no file found'
     else:
         return 'no file found'
 
