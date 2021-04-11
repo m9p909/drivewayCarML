@@ -57,8 +57,11 @@ def insertIntoDB(path):
 def createPicture():
     try:
         path = takePicture(getNextId())
-        insertIntoDB(path)
-        print('Stored picture to '+path)
+        if path == "ERROR NO PATH":
+            print("picture taking failed")
+        else:
+            insertIntoDB(path)
+            print('Stored picture to '+path)
     except Exception as e:
         traceback.print_exc()
 
