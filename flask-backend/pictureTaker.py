@@ -16,7 +16,7 @@ if(os.uname()[4][:3] == 'arm'):
 def takePicture(id):
     """ Takes a picture with the webcam and returns the directory in ./tmp """
     if(onPi):
-        path = '~/pictures/'+str(id)+'.jpg'
+        path = '/home/pi/pictures/'+str(id)+'.jpg'
         camera = PiCamera()
         camera.start_preview()
         sleep(5)
