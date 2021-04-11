@@ -92,9 +92,12 @@ def data():
 
 @app.route('/images', methods=['GET'])
 def images():
-    num = int(request.args.get('id'))
-    return send_file(shared.getPicturePath(num))
-
+    res = request.args.get('id')
+    if res != None:
+        num = int(request.args.get('id'))
+        return send_file(shared.getPicturePath(num))
+    else:
+        return 'no file found'
 
 @app.route('/')
 def hello_world():
