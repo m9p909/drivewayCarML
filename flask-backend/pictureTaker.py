@@ -60,6 +60,7 @@ def createPicture():
 
 
 def runScheduledTasks():
+    createPicture()
     scheduler = BackgroundScheduler()
     # jobs go here
     if(onPi):
