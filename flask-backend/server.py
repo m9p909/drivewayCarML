@@ -5,6 +5,7 @@ import base64
 import sqlite3
 import json
 import pictureTaker
+from database import setupDatabase
 
 
 app = Flask(__name__)
@@ -14,8 +15,7 @@ def validateclean_score(number):
         return number <= 5 and number >= 1
 
 
-def setupDatabase():
-    return sqlite3.connect('carml.db')
+
 
 
 def dataPost(image, clean_score=-1):

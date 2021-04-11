@@ -4,8 +4,8 @@ import atexit
 from datetime import datetime
 import os
 import shutil
-from server import setupDatabase
 import traceback
+from database import setupDatabase
 
 onPi = False
 if(os.uname()[4][:3] == 'arm'):
