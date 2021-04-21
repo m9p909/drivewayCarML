@@ -75,7 +75,7 @@ def runScheduledTasks():
     if(onPi):
         scheduler.add_job(func=createPicture, trigger="interval", hours=1)
     else:
-        scheduler.add_job(func=createPicture, trigger="interval", seconds=30)
+        scheduler.add_job(func=createPicture, trigger="interval", hours=2)
     scheduler.start()
 
     # Shut down the scheduler when exiting the app

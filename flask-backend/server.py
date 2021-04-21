@@ -12,16 +12,9 @@ import shared
 app = Flask(__name__)
 
 
-def validateclean_score(number):
-        return number <= 5 and number >= 1
-
-
-
-
-
 def dataPost(image, clean_score=-1):
     '''Posts a valid input to database, receives image binary and optionally a value for 'clean_score'  
-    
+
     This method is currently INVALID, it will not work properly'''
     return None
     con = shared.setupDatabase()
@@ -30,9 +23,8 @@ def dataPost(image, clean_score=-1):
                 ([sqlite3.Binary(image)]))
     if clean_score != -1:
         clean_score = int(clean_score)
-        if validateclean_score(clean_score):
-            cur.execute(
-                "update images set clean_score=? where id=(select max(id) from images)", (clean_score,))
+        cur.execute(
+            "update images set clean_score=? where id=(select max(id) from images)", (clean_score,))
 
     con.commit()
     return 'success'
@@ -49,13 +41,19 @@ def dataGet(stuff):
 def dataPut(stuff):
     con = shared.setupDatabase()
     cur = con.cursor()
-    if 'id' in stuff:
-        if 'clean_score' in stuff:
-            if validateclean_score(stuff['clean_score']):
-                cur.execute('update images set clean_score=? where id=?',
-                            (stuff['clean_score'], stuff['id']))
-            else:
-                abort(400)
+    possible_values = ['cupboards_open']
+
+    if 'data' in stuff:
+        updates = stuff['data']
+        for update in updates:
+            allUpdates = {}
+            if('id' in update and 'changes' in update):
+                changes = update['changes']
+                for value in changes :
+                    # https://stackoverflow.com/questions/38420829/variable-column-name-in-sql-lite-and-python
+                    cur.execute('update images set {} = ? where id = ?'.format(value),(int(changes[value]), int(update['id'])))
+    else:
+        abort(400)
     con.commit()
 
     return "success"
@@ -73,9 +71,9 @@ def data():
     if request.method == 'POST':
         if 'file' in request.files:
             imagedata = request.files['file']
-            if 'clean_score' in request.args:
-                clean_score = request.args.get('clean_score')
-                return dataPost(imagedata.read(), clean_score)
+            if 'cupboards_open' in request.args:
+                cupboards_open = request.args.get('cupboards_open')
+                return dataPost(imagedata.read(), cupboards_open)
             else:
                 return dataPost(imagedata.read())
         else:
@@ -86,6 +84,7 @@ def data():
         return dataGet(request)
     elif request.method == 'DELETE':
         return dataDelete(request)
+
 
 @app.route('/images', methods=['GET'])
 def images():
@@ -99,9 +98,10 @@ def images():
     else:
         return 'no file found'
 
+
 @app.route('/')
 def hello_world():
-   return 'Hello World'
+    return 'Hello World'
 
 
 if __name__ == '__main__':
